@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Attendance</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #attendanceForm {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        select {
+            border: 2px solid #4CAF50;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <form id="attendanceForm">
+        <h2>Attendance Form</h2>
+        
+        <label for="employeeName">Employee Name:</label>
+        <select id="employeeName" name="employeeName" required>
+            <option value="">Select Employee</option>
+            <option value="RISHI KUMAR.D.S">RISHI KUMAR.D.S</option>
+            <option value="KOSIK.V">KOSIK.V</option>
+            <option value="SANTHANA KRISHNAN.T.S">SANTHANA KRISHNAN.T.S</option>
+            <option value="DHARSAN.S">DHARSAN.S</option>
+            <option value="PAVITHRA.M.K">PAVITHRA.M.K</option>
+        </select>
+
+        <div class="radio-group">
+            <label>
+                <input type="radio" id="punchIn" name="punch" value="Punch In" required> Punch In
+            </label>
+            <label>
+                <input type="radio" id="punchOut" name="punch" value="Punch Out"> Punch Out
+            </label>
+        </div>
+
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+        
+        <button type="submit">Submit Attendance</button>
+    </form>
+
+    <script>
+        document.getElementById("attendanceForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        document.getElementById("latitude").value = latitude;
+                        document.getElementById("longitude").value = longitude;
+
+                        submitForm();
+                    },
+                    (error) => {
+                        alert('Error getting location. Please enable location services.');
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        });
+
+        function submitForm() {
+            const formData = new FormData(document.getElementById("attendanceForm"));
+            
+            fetch("https://script.google.com/macros/s/AKfycbw-tz5NC0ysYyRqi5eWDRLLFFBb-rMRK1ndCeQkgRKPjAER_jUWz3LG_B3LRcDItlA/exec", { // Replace with your Google Apps Script Web App URL
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById("attendanceForm").reset();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to record attendance.");
+            });
+        }
+    </script>
+</body>
+</html>
